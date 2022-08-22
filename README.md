@@ -16,7 +16,7 @@ console.log(concatPath('http://foo.bar/a/b/', '/my/path.txt'))
 // 'http://foo.bar/a/b/my/path.txt'
 ```
 
-## `resolveUrl(...uris)`
+## `resolveUrl(...uris)`
 
 Resolves URLs one after another starting from the first one and returns the string-serialized resulting URI.
 
@@ -27,8 +27,7 @@ console.log(resolveUrl('http://foo.bar/a/b/', '../doc/', './my/path.txt'))
 // 'http://foo.bar/a/doc/my/path.txt'
 ```
 
-
-## `makeRelative(first, second)`
+## `makeRelative(first, second)`
 
 Returns the relative paths from the first URI to the second one.
 
@@ -39,8 +38,7 @@ console.log(makeRelative('http://foo.bar/a/b/index.md', 'http://foo.bar/a/c/d/re
 // '../c/d/readme.md'
 ```
 
-
-## `newPathMapping`
+## `newPathMapping`
 
 This method returns a function rewriting URIs.
 The parameter of this method defines source base URIs with the corresponding target paths. 
