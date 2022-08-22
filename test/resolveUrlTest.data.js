@@ -1,11 +1,11 @@
 export default [
-  {
-    message: 'should properly resolve mail URLs',
-    baseUrl: 'file:///foo/bar/baz',
-    list: [
-      ['mailto:foo@bar.baz', 'mailto:foo@bar.baz'],
-    ]
-  },
+  // {
+  //   message: 'should properly resolve mail URLs',
+  //   baseUrl: 'file:///foo/bar/baz',
+  //   list: [
+  //     ['mailto:foo@bar.baz', 'mailto:foo@bar.baz'],
+  //   ]
+  // },
   {
     message: 'should properly resolve relative URLs',
     baseUrl: 'file:///foo/bar/baz',

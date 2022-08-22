@@ -108,7 +108,10 @@ export function resolveUri(from, to) {
     };
   }
   let result = newUri(to);
-  if (from.schema === to.schema && from.domain === to.domain) {
+  let resolve = (!from.schema && !from.domain)
+    || (!to.schema && !to.domain)
+    || (from.schema === to.schema && from.domain === to.domain);
+  if (resolve) {
     const toPath = _splitPath(to.path);
     let path;
     if (toPath.length && !toPath[0]) { // Target path is absolute
