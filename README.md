@@ -1,8 +1,10 @@
 
 # @statewalker/uris: URIs Management Utilities
 
-A small library (3.5K compressed/minimized) to manage URIs - parsing, serialization,
+A small library (~2.5K compressed/minimized) to manage URIs - parsing, serialization,
 path resolving, relative paths generation, concatenation and URIs rewriting.
+
+For working examples see this Observable Notebook: https://observablehq.com/@kotelnikov/statewalker-uris.
 
 ## `concatPath(...uris)`
 
