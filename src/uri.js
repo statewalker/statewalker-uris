@@ -1,10 +1,10 @@
-export function parseQuery(query) {
+export function parseQuery(query, decode = decodeQueryComponent) {
   const result = {};
-  const vars = query.split('&');
+  const vars = query.split("&");
   for (let i = 0; i < vars.length; i++) {
-    const pair = vars[i].split('=');
-    const key = decodeURIComponent(pair[0]);
-    let value = decodeURIComponent(pair[1]);
+    const pair = vars[i].split("=");
+    const key = decode(pair[0]);
+    let value = decode(pair[1]);
     let prevValue = result[key];
     if (prevValue !== undefined) {
       const array = result[key] = Array.isArray(prevValue)
@@ -19,24 +19,24 @@ export function parseQuery(query) {
 }
 
 export function parseUri(uri) {
-  if (typeof uri === 'object') return uri;
-  uri = (uri || '') + '';
-  let schema = '', domain = '', path = '', query = {}, fragment = '';
+  if (typeof uri === "object") return uri;
+  uri = (uri || "") + "";
+  let schema = "", domain = "", path = "", query = {}, fragment = "";
   uri.replace(
     /^((\S*?):)?(\/\/([\d\w][^/]*)?)?(\/?[^#?]*?)(\?[^#]*)?(#.*)?$/,
     function (_, _a, s, _d, d, p, q, f) {
-      schema = s || '';
-      domain = d || '';
+      schema = s || "";
+      domain = d || "";
       path = p;
       q = q ? parseQuery(q.substring(1)) : {};
       query = q;
-      fragment = f || '';
-    }
+      fragment = f || "";
+    },
   );
-  return { schema, domain, path, query, fragment }
+  return { schema, domain, path, query, fragment };
 }
 
-export function serializeQuery(query) {
+export function serializeQuery(query, encode = encodeQueryComponent) {
   let result = [];
   for (let [key, value] of Object.entries(query)) {
     if (Array.isArray(value)) {
@@ -47,26 +47,28 @@ export function serializeQuery(query) {
       result.push([key, value]);
     }
   }
-  return result.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
+  return result
+    .map(([key, value]) => `${encode(key)}=${encode(value)}`)
+    .join("&");
 }
 
 export function serializeUri(options) {
-  if (typeof options === 'string') return options;
+  if (typeof options === "string") return options;
   let { schema, domain, path, query, fragment } = options;
-  let uri = '';
-  if (schema) { uri += `${schema}:`; }
-  if (domain) { uri += `//${domain}`; }
-  else if (schema && path && path[0] === '/') { uri += '//'; }
+  let uri = "";
+  if (schema) uri += `${schema}:`;
+  if (domain) uri += `//${domain}`;
+  else if (schema && path && path[0] === "/") uri += "//";
   if (path) {
-    if (domain && path[0] !== '/') path = `/${path}`;
+    if (domain && path[0] !== "/") path = `/${path}`;
     uri += path;
   }
   if (query) {
-    if (typeof query === 'object') query = serializeQuery(query);
+    if (typeof query === "object") query = serializeQuery(query);
     if (query) uri += `?${query}`;
   }
   if (fragment) {
-    if (fragment[0] !== '#') fragment = `#${fragment}`;
+    if (fragment[0] !== "#") fragment = `#${fragment}`;
     uri += fragment;
   }
   return uri;
@@ -74,11 +76,11 @@ export function serializeUri(options) {
 
 export function newUri(...list) {
   const result = {
-    schema: '',
-    domain: '',
-    path: '',
+    schema: "",
+    domain: "",
+    path: "",
     query: {},
-    fragment : ''
+    fragment: "",
   };
   for (const uri of list) {
     uri.schema && (result.schema = uri.schema);
@@ -103,14 +105,14 @@ export function resolveUri(from, to) {
     to = {
       ...from,
       path: to.path,
-      query : to.query,
-      fragment : to.fragment
+      query: to.query,
+      fragment: to.fragment,
     };
   }
   let result = newUri(to);
-  let resolve = (!from.schema && !from.domain)
-    || (!to.schema && !to.domain)
-    || (from.schema === to.schema && from.domain === to.domain);
+  let resolve = (!from.schema && !from.domain) ||
+    (!to.schema && !to.domain) ||
+    (from.schema === to.schema && from.domain === to.domain);
   if (resolve) {
     const toPath = _splitPath(to.path);
     let path;
@@ -121,7 +123,7 @@ export function resolveUri(from, to) {
       const segments = [...fromPath, ...toPath];
       path = _resolve(segments);
     }
-    result.path = path.join('/');
+    result.path = path.join("/");
   }
   if (to.query) result.query = to.query;
   if (to.fragment) result.fragment = to.fragment;
@@ -142,13 +144,13 @@ export function makeRelativeUri(from, to) {
       if (fromPath[commonLen] !== toPath[commonLen]) break;
     }
     const path = [];
-    for (let i = commonLen; i < fromPath.length; i++) path.push('..');
-    if (!path.length) path.push('.');
+    for (let i = commonLen; i < fromPath.length; i++) path.push("..");
+    if (!path.length) path.push(".");
     for (let i = commonLen; i < toPath.length; i++) path.push(toPath[i]);
     result = newUri({
-      path: path.join('/'),
+      path: path.join("/"),
       query: to.query,
-      fragment : to.fragment
+      fragment: to.fragment,
     });
   }
   return result;
@@ -163,7 +165,9 @@ export function joinUri(...uris) {
   let fragment = result.fragment;
   for (const uri of uris) {
     const segments = _splitPath(uri.path);
-    if (idx > 0 && (segments[0] === '' || segments[0] === '.')) segments.shift();
+    if (idx > 0 && (segments[0] === "" || segments[0] === ".")) {
+      segments.shift();
+    }
     if (segments.length) {
       if (path.length > 1 && !path[path.length - 1]) path.pop();
       path.push(...segments);
@@ -172,7 +176,7 @@ export function joinUri(...uris) {
     fragment = uri.fragment;
     idx++;
   }
-  result.path = path.join('/');
+  result.path = path.join("/");
   result.query = { ...query };
   result.fragment = fragment;
   return result;
@@ -180,7 +184,7 @@ export function joinUri(...uris) {
 
 function _splitPath(path) {
   if (!path) return [];
-  return path.split('/');
+  return path.split("/");
 }
 
 function _splitSourcePath(path) {
@@ -195,11 +199,26 @@ function _resolve(segments) {
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
     if (i < segments.length - 1 && !segment) continue;
-    if (i > 0 && segment === '.') continue;
-    if (segment === '..') path.pop();
+    if (i > 0 && segment === ".") continue;
+    if (segment === "..") path.pop();
     else path.push(segment);
   }
-  if (path[0] !== '/' && path[0] !== '.') path.unshift('');
+  if (path[0] !== "/" && path[0] !== ".") path.unshift("");
   return path;
 }
 
+export function decodeQueryComponent(str) {
+  try {
+    return decodeURIComponent(str);
+  } catch (error) {
+    return str;
+  }
+}
+
+export function encodeQueryComponent(str) {
+  try {
+    return encodeURIComponent(str);
+  } catch (error) {
+    return str;
+  }
+}
